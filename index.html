@@ -5,36 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI/ML & Backend Engineering Roadmap</title>
     <style>
+        /* Soothing, low-contrast dark theme */
         :root {
-            /* Soothing Color Palette */
-            --bg-color: #f4f5f4;        /* Very soft grey-green off-white */
-            --card-bg: #ffffff;         /* Pure white for content clarity */
-            --text-main: #4a5568;       /* Soft slate grey, easier on the eyes than pure black */
-            --text-muted: #94a3b8;      /* Gentle muted grey */
-            --accent: #7fa192;          /* Calming sage green */
-            --accent-hover: #658577;    /* Slightly deeper sage for hover states */
-            --border: #e2e8f0;          /* Very faint border */
-            --success: #88b5a1;         /* Gentle green for progress bars */
-            --shadow: 0 8px 30px rgba(0, 0, 0, 0.04); /* Soft, diffused shadow */
+            --bg-base: #1e1e2e;
+            --bg-surface: #313244;
+            --bg-surface-hover: #45475a;
+            --text-main: #cdd6f4;
+            --text-muted: #a6adc8;
+            --accent-lavender: #b4befe;
+            --accent-green: #a6e3a1;
+            --border-soft: rgba(255, 255, 255, 0.05);
+            --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.15);
+            --radius-lg: 16px;
+            --radius-md: 10px;
+            --radius-sm: 6px;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
 
         body {
-            background-color: var(--bg-color);
+            background-color: var(--bg-base);
             color: var(--text-main);
             line-height: 1.7;
             padding: 40px 20px;
-            transition: background-color 0.4s ease;
+            -webkit-font-smoothing: antialiased;
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 900px;
             margin: 0 auto;
         }
 
@@ -44,31 +47,30 @@
         }
 
         h1 {
-            color: var(--text-main);
-            margin-bottom: 12px;
+            color: var(--accent-lavender);
             font-weight: 600;
             letter-spacing: -0.5px;
+            margin-bottom: 8px;
         }
-        
+
         header p {
-            color: var(--accent);
+            color: var(--text-muted);
             font-size: 1.1em;
         }
 
-        /* Progress Section */
+        /* Progress Dashboard - Soothing Cards */
         .progress-dashboard {
-            background-color: var(--card-bg);
-            padding: 30px;
-            border-radius: 16px;
-            margin-bottom: 25px;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
+            background-color: var(--bg-surface);
+            padding: 24px 30px;
+            border-radius: var(--radius-lg);
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-soft);
         }
 
         .progress-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             font-weight: 500;
             color: var(--text-main);
         }
@@ -76,27 +78,33 @@
         .progress-bar-container {
             width: 100%;
             height: 12px;
-            background-color: var(--bg-color);
+            background-color: var(--bg-base);
             border-radius: 20px;
             overflow: hidden;
-            border: inset 1px rgba(0,0,0,0.02);
         }
 
         .progress-bar-fill {
             height: 100%;
-            background-color: var(--success);
+            background-color: var(--accent-green);
             width: 0%;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
             border-radius: 20px;
-            transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+            box-shadow: 0 0 10px rgba(166, 227, 161, 0.4);
         }
 
         .category-progress {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 15px;
+            gap: 12px;
             margin-top: 20px;
-            font-size: 0.9em;
+            font-size: 0.85em;
             color: var(--text-muted);
+        }
+
+        .category-progress div {
+            background-color: rgba(0,0,0,0.15);
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
         }
 
         /* Controls */
@@ -104,108 +112,117 @@
             display: flex;
             flex-wrap: wrap;
             gap: 12px;
-            margin-bottom: 25px;
+            margin-bottom: 24px;
         }
 
         button {
-            background-color: var(--card-bg);
+            background-color: var(--bg-surface);
             color: var(--text-main);
-            border: 1px solid var(--border);
+            border: none;
             padding: 10px 18px;
-            border-radius: 8px;
+            border-radius: var(--radius-md);
             cursor: pointer;
+            font-size: 0.9em;
             font-weight: 500;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
         button:hover {
-            background-color: var(--accent);
-            color: white;
-            border-color: var(--accent);
+            background-color: var(--bg-surface-hover);
+            color: var(--accent-lavender);
             transform: translateY(-1px);
-            box-shadow: 0 4px 10px rgba(127, 161, 146, 0.2);
         }
 
         input[type="text"] {
             flex-grow: 1;
-            padding: 10px 15px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            background-color: var(--card-bg);
+            padding: 12px 20px;
+            border-radius: var(--radius-md);
+            border: none;
+            background-color: var(--bg-surface);
             color: var(--text-main);
             min-width: 250px;
-            transition: all 0.3s ease;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.01);
+            font-size: 0.95em;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: box-shadow 0.2s ease;
         }
 
-        input[type="text"]:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(127, 161, 146, 0.1);
-        }
-        
         input[type="text"]::placeholder {
             color: var(--text-muted);
         }
 
+        input[type="text"]:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--accent-lavender);
+        }
+
         /* Tree Styles */
         .tree-container {
-            background-color: var(--card-bg);
-            padding: 30px;
-            border-radius: 16px;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
+            background-color: transparent;
         }
 
         .node {
-            margin-top: 8px;
+            margin-top: 6px;
+        }
+
+        /* Root nodes look like separate soft cards */
+        .tree-container > .node {
+            background-color: var(--bg-surface);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow-soft);
         }
 
         .node-content {
             display: flex;
             align-items: flex-start;
-            padding: 10px 12px;
-            border-radius: 8px;
-            transition: background-color 0.3s ease;
+            padding: 8px;
+            border-radius: var(--radius-md);
+            transition: background-color 0.2s ease;
         }
 
         .node-content:hover {
-            background-color: var(--bg-color);
+            background-color: rgba(255, 255, 255, 0.03);
         }
 
         .toggle-btn {
             background: none;
             border: none;
+            box-shadow: none;
             color: var(--text-muted);
-            width: 24px;
-            height: 24px;
+            width: 28px;
+            height: 28px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.9em;
+            font-size: 0.8em;
             padding: 0;
             margin-right: 8px;
-            margin-top: 2px;
-            box-shadow: none;
+            border-radius: 50%;
         }
 
         .toggle-btn:hover {
-            color: var(--accent);
-            background: none;
-            transform: scale(1.1);
-            box-shadow: none;
+            color: var(--accent-lavender);
+            background-color: rgba(255, 255, 255, 0.05);
+            transform: none;
         }
 
+        /* Soft custom checkbox */
         .checkbox {
             margin-top: 6px;
-            margin-right: 15px;
+            margin-right: 14px;
             cursor: pointer;
             width: 18px;
             height: 18px;
-            accent-color: var(--accent);
-            transition: all 0.2s;
+            accent-color: var(--accent-green);
+            opacity: 0.8;
+            transition: opacity 0.2s ease;
+        }
+        
+        .checkbox:hover {
+            opacity: 1;
         }
 
         .node-text {
@@ -218,95 +235,41 @@
             transition: color 0.3s ease;
         }
 
+        /* Soothing strikethrough for completed items */
         .node-title.completed {
             text-decoration: line-through;
             color: var(--text-muted);
-            opacity: 0.7;
+            opacity: 0.6;
         }
 
         .node-desc {
             font-size: 0.9em;
             color: var(--text-muted);
             margin-top: 4px;
+            line-height: 1.5;
         }
 
         .node-meta {
-            font-size: 0.85em;
-            margin-top: 6px;
-            color: var(--accent);
-            background-color: rgba(127, 161, 146, 0.1);
             display: inline-block;
-            padding: 2px 8px;
-            border-radius: 4px;
+            font-size: 0.75em;
+            margin-top: 8px;
+            padding: 4px 10px;
+            background-color: rgba(180, 190, 254, 0.1);
+            color: var(--accent-lavender);
+            border-radius: 20px;
+            letter-spacing: 0.3px;
         }
 
         .children-container {
-            margin-left: 30px;
-            border-left: 2px solid #f0f2f5;
-            padding-left: 15px;
-            display: none; 
+            margin-left: 32px;
+            border-left: 1px solid var(--border-soft);
+            padding-left: 12px;
+            display: none;
         }
 
         .children-container.expanded {
             display: block;
-            animation: fadeIn 0.4s ease;
-        }
-
-        /* Resources Styles */
-        .resources {
-            margin-top: 12px;
-            margin-bottom: 12px;
-            padding: 20px;
-            background-color: #fafbfb;
-            border-radius: 8px;
-            border-left: 4px solid var(--accent);
-            font-size: 0.9em;
-            display: none;
-        }
-
-        .resources.expanded {
-            display: block;
-            animation: fadeIn 0.4s ease;
-        }
-
-        .resources h4 {
-            margin-bottom: 12px;
-            color: var(--text-main);
-            font-weight: 600;
-        }
-
-        .resources ul {
-            list-style-type: none;
-            margin-bottom: 15px;
-        }
-        
-        .resources ul:last-child {
-            margin-bottom: 0;
-        }
-
-        .resources li {
-            margin-bottom: 6px;
-            position: relative;
-            padding-left: 15px;
-        }
-        
-        .resources li::before {
-            content: "•";
-            position: absolute;
-            left: 0;
-            color: var(--accent);
-        }
-
-        .resources a {
-            color: var(--text-main);
-            text-decoration: none;
-            transition: color 0.2s ease;
-        }
-
-        .resources a:hover {
-            color: var(--accent-hover);
-            text-decoration: underline;
-            text-decoration-color: var(--accent-hover);
+            animation: fadeIn 0.3s ease;
         }
 
         .hidden {
@@ -314,14 +277,20 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-5px); }
+            from { opacity: 0; transform: translateY(-4px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         @media (max-width: 600px) {
-            body { padding: 20px 15px; }
-            .controls { flex-direction: column; }
-            input[type="text"] { width: 100%; }
+            .controls {
+                flex-direction: column;
+            }
+            input[type="text"] {
+                width: 100%;
+            }
+            .category-progress {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -329,14 +298,14 @@
 
 <div class="container">
     <header>
-        <h1>AI/ML & Backend Engineering Roadmap</h1>
-        <p>The 1% Engineer Trajectory</p>
+        <h1>AI/ML & Backend Architecture</h1>
+        <p>A focused, distraction-free roadmap to mastery</p>
     </header>
 
     <div class="progress-dashboard">
         <div class="progress-header">
-            <span>Overall Progress</span>
-            <span id="overall-percentage">0% (0 / 0 completed)</span>
+            <span>Overall Journey</span>
+            <span id="overall-percentage">0%</span>
         </div>
         <div class="progress-bar-container">
             <div class="progress-bar-fill" id="overall-bar"></div>
@@ -347,12 +316,12 @@
     </div>
 
     <div class="controls">
-        <input type="text" id="search-input" placeholder="Search topics, skills, projects...">
+        <input type="text" id="search-input" placeholder="Search concepts, tools, or projects...">
         <button id="btn-expand-all">Expand All</button>
         <button id="btn-collapse-all">Collapse All</button>
         <button id="btn-check-all">Check All</button>
         <button id="btn-uncheck-all">Uncheck All</button>
-        <button id="btn-reset">Reset Progress</button>
+        <button id="btn-reset">Reset</button>
     </div>
 
     <div class="tree-container" id="roadmap-tree">
