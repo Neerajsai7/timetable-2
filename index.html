@@ -3,114 +3,304 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elite Pipeline | V7 Intelligence</title>
+    <title>AI/ML & Backend Engineering Roadmap</title>
     <style>
         :root {
-            --bg-color: #0f172a; --card-bg: #1e293b; --text-main: #f8fafc;
-            --text-muted: #94a3b8; --accent: #3b82f6; --success: #10b981;
-            --warning: #f59e0b; --danger: #ef4444; --border: #334155; --project: #8b5cf6;
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-main: #e0e0e0;
+            --text-muted: #a0a0a0;
+            --accent: #bb86fc;
+            --accent-hover: #9965f4;
+            --border: #333333;
+            --success: #03dac6;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-main); padding: 2rem; }
-        .container { max-width: 1200px; margin: 0 auto; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-        header { text-align: center; margin-bottom: 1.5rem; }
-        header h1 { font-size: 2.5rem; color: var(--accent); }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 20px;
+        }
 
-        /* Tabs UI */
-        .tabs { display: flex; justify-content: center; gap: 1rem; margin-bottom: 2rem; }
-        .tab-btn { background: var(--card-bg); color: var(--text-muted); border: 1px solid var(--border); padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: all 0.3s; }
-        .tab-btn:hover { background: rgba(59, 130, 246, 0.1); color: var(--text-main); }
-        .tab-btn.active { background: rgba(59, 130, 246, 0.2); color: var(--accent); border-color: var(--accent); box-shadow: 0 0 10px rgba(59, 130, 246, 0.2); }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
 
-        /* Analytics Dashboard */
-        .analytics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
-        .stat-card { background: var(--card-bg); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border); }
-        .stat-card h3 { color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase; margin-bottom: 0.5rem; }
-        .stat-card .value { font-size: 2rem; font-weight: bold; }
-        
-        /* Fatigue Meter */
-        .fatigue-bar-bg { width: 100%; background: var(--bg-color); height: 10px; border-radius: 5px; margin-top: 10px; overflow: hidden;}
-        .fatigue-bar-fill { height: 100%; transition: width 0.3s; }
-        .fatigue-safe { background: var(--success); } .fatigue-warn { background: var(--warning); } .fatigue-danger { background: var(--danger); }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
 
-        /* Confidence & Weak Areas */
-        .weak-area-tag { display: inline-block; background: rgba(239, 68, 68, 0.1); color: var(--danger); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; margin: 4px; border: 1px solid var(--danger); }
-        
-        .days-container { display: flex; flex-direction: column; gap: 1rem; }
-        .day-card { background-color: var(--card-bg); border-radius: 8px; border: 1px solid var(--border); overflow: hidden; }
-        .day-header { padding: 1rem 1.5rem; background-color: rgba(255,255,255,0.02); display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-        .day-badge { background-color: var(--accent); color: white; padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.8rem; }
-        
-        .day-card.active .subtopics-list { padding: 1rem 1.5rem; max-height: 2000px; border-top: 1px solid var(--border); }
-        .subtopics-list { padding: 0 1.5rem; max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.3s ease; }
-        
-        .subtopic-item { display: flex; flex-direction: column; margin-bottom: 1.2rem; gap: 0.5rem; padding-bottom: 1rem; border-bottom: 1px dashed var(--border); }
-        .task-main-row { display: flex; align-items: center; gap: 1rem; width: 100%; }
-        
-        input[type="checkbox"] { appearance: none; width: 22px; height: 22px; border: 2px solid var(--text-muted); border-radius: 6px; cursor: pointer; position: relative; flex-shrink: 0;}
-        input[type="checkbox"]:checked { background-color: var(--success); border-color: var(--success); }
-        input[type="checkbox"]:checked::after { content: '✔'; position: absolute; color: white; font-size: 14px; top: -1px; left: 4px; }
-        
-        .task-label { flex-grow: 1; font-size: 1rem; }
-        .completed-text { color: var(--text-muted); text-decoration: line-through; }
-        
-        .inline-link { background: rgba(59, 130, 246, 0.1); color: var(--accent); text-decoration: none; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; border: 1px solid var(--accent); transition: all 0.2s; white-space: nowrap; }
-        .inline-link:hover { background: var(--accent); color: white; }
+        h1 {
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
 
-        /* Tags */
-        .diff-tag { font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; font-weight: bold; text-transform: uppercase; margin-left: 8px;}
-        .diff-easy { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid var(--success); }
-        .diff-med { background: rgba(245, 158, 11, 0.1); color: var(--warning); border: 1px solid var(--warning); }
-        .diff-hard { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid var(--danger); }
-        .type-project { background: rgba(139, 92, 246, 0.1); color: var(--project); border: 1px solid var(--project); }
+        /* Progress Section */
+        .progress-dashboard {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
 
-        /* Confidence Scorer */
-        .confidence-panel { display: none; margin-left: 38px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px; align-items: center; gap: 10px; }
-        .confidence-panel.visible { display: flex; }
-        .conf-btn { background: transparent; border: 1px solid var(--border); color: var(--text-muted); padding: 4px 12px; border-radius: 4px; cursor: pointer; transition: 0.2s; }
-        .conf-btn:hover { background: var(--border); }
-        .conf-btn.selected { background: var(--accent); color: white; border-color: var(--accent); }
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 20px;
+            background-color: var(--bg-color);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background-color: var(--success);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .category-progress {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+            font-size: 0.9em;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: var(--card-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--border);
+            color: var(--accent);
+        }
+
+        input[type="text"] {
+            flex-grow: 1;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background-color: var(--card-bg);
+            color: var(--text-main);
+            min-width: 250px;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        /* Tree Styles */
+        .tree-container {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .node {
+            margin-top: 8px;
+        }
+
+        .node-content {
+            display: flex;
+            align-items: flex-start;
+            padding: 8px;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+        }
+
+        .node-content:hover {
+            background-color: #2a2a2a;
+        }
+
+        .toggle-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            padding: 0;
+            margin-right: 5px;
+        }
+
+        .toggle-btn:hover {
+            color: var(--accent);
+            background: none;
+        }
+
+        .checkbox {
+            margin-top: 5px;
+            margin-right: 12px;
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+            accent-color: var(--accent);
+        }
+
+        .node-text {
+            flex-grow: 1;
+        }
+
+        .node-title {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .node-title.completed {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        .node-desc {
+            font-size: 0.85em;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .node-meta {
+            font-size: 0.8em;
+            margin-top: 4px;
+            color: var(--accent);
+        }
+
+        .children-container {
+            margin-left: 28px;
+            border-left: 1px solid var(--border);
+            padding-left: 10px;
+            display: none; /* Hidden by default */
+        }
+
+        .children-container.expanded {
+            display: block;
+        }
+
+        /* Resources Styles */
+        .resources {
+            margin-top: 10px;
+            padding: 12px;
+            background-color: #252525;
+            border-radius: 6px;
+            border-left: 3px solid var(--accent);
+            font-size: 0.85em;
+            display: none;
+        }
+
+        .resources.expanded {
+            display: block;
+        }
+
+        .resources h4 {
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        .resources ul {
+            list-style-type: none;
+            margin-bottom: 10px;
+        }
+
+        .resources li {
+            margin-bottom: 4px;
+        }
+
+        .resources a {
+            color: var(--success);
+            text-decoration: none;
+        }
+
+        .resources a:hover {
+            text-decoration: underline;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 600px) {
+            .controls {
+                flex-direction: column;
+            }
+            input[type="text"] {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Intelligence Tracker V7</h1>
-            <p id="date-display">System Initializing...</p>
-        </header>
 
-        <div class="tabs">
-            <button id="btn-main" class="tab-btn active" onclick="switchTab('main')">Core AI / Backend</button>
-            <button id="btn-foundations" class="tab-btn" onclick="switchTab('foundations')">Math & DSA</button>
+<div class="container">
+    <header>
+        <h1>AI/ML & Backend Engineering Roadmap</h1>
+        <p>The 1% Engineer Trajectory</p>
+    </header>
+
+    <div class="progress-dashboard">
+        <div class="progress-header">
+            <span>Overall Progress</span>
+            <span id="overall-percentage">0% (0 / 0 completed)</span>
         </div>
-
-        <div class="analytics-grid">
-            <div class="stat-card">
-                <h3>Fatigue / Burnout Control</h3>
-                <div class="value" id="effort-display">0 / 6 Hrs</div>
-                <div class="fatigue-bar-bg"><div id="fatigue-bar" class="fatigue-bar-fill fatigue-safe" style="width: 0%;"></div></div>
-                <p id="fatigue-warning" style="font-size: 0.8rem; margin-top: 8px; color: var(--text-muted);">Deep work capacity healthy.</p>
-            </div>
-            <div class="stat-card">
-                <h3>Output Validation</h3>
-                <div class="value" id="confidence-display" style="color: var(--accent);">0.0 <span style="font-size: 1rem; color: var(--text-muted);">Avg Confidence</span></div>
-                <p style="font-size: 0.8rem; color: var(--text-muted);">Self-assessed mastery (Scale 1-5).</p>
-            </div>
-            <div class="stat-card">
-                <h3>AI Weak Area Detection</h3>
-                <div id="weak-areas-container" style="margin-top: 10px;">
-                    <span style="font-size: 0.9rem; color: var(--text-muted);">No weak areas detected yet.</span>
-                </div>
-            </div>
+        <div class="progress-bar-container">
+            <div class="progress-bar-fill" id="overall-bar"></div>
         </div>
-
-        <div class="card" style="background: transparent; border: none; padding: 0;">
-            <div class="days-container" id="days-container"></div>
+        <div class="category-progress" id="category-progress-container">
+            <!-- Populated via JS -->
         </div>
     </div>
-    <script src="data.js"></script>
-    <script src="app.js"></script>
+
+    <div class="controls">
+        <input type="text" id="search-input" placeholder="Search topics, skills, projects...">
+        <button id="btn-expand-all">Expand All</button>
+        <button id="btn-collapse-all">Collapse All</button>
+        <button id="btn-check-all">Check All</button>
+        <button id="btn-uncheck-all">Uncheck All</button>
+        <button id="btn-reset">Reset Progress</button>
+    </div>
+
+    <div class="tree-container" id="roadmap-tree">
+        <!-- Tree rendered via JS -->
+    </div>
+</div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
