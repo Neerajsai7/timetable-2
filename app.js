@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const LOCAL_STORAGE_KEY = 'ai_roadmap_progress';
+    const LOCAL_STORAGE_KEY = 'ai_roadmap_progress_v2'; // Changed key to reset old states
     let progressState = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || {};
     
     const treeContainer = document.getElementById('roadmap-tree');
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const contentDiv = document.createElement('div');
             contentDiv.className = 'node-content';
 
-            // Expand/Collapse Button
+            // Expand/Collapse Button (Soft arrows)
             const toggleBtn = document.createElement('button');
             toggleBtn.className = 'toggle-btn';
             if (hasChildren) {
@@ -74,36 +74,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (node.difficulty || node.tech || node.time) {
                 const metaSpan = document.createElement('div');
                 metaSpan.className = 'node-meta';
-                metaSpan.textContent = `[${node.difficulty}] Stack: ${node.tech} | Est: ${node.time}`;
+                metaSpan.textContent = `${node.difficulty} • ${node.tech} • ${node.time}`;
                 textDiv.appendChild(metaSpan);
             }
 
             contentDiv.appendChild(textDiv);
             nodeDiv.appendChild(contentDiv);
-
-            // Resources Section
-            if (node.resources) {
-                const resDiv = document.createElement('div');
-                resDiv.className = 'resources';
-                resDiv.id = `res-${currentPath}`;
-                
-                let resHTML = `<h4>Learning Resources</h4>`;
-                
-                const buildLinks = (title, items) => {
-                    if (!items || items.length === 0) return '';
-                    return `<strong>${title}:</strong> <ul>` + items.map(item => 
-                        `<li><a href="${item.url}" target="_blank" rel="noopener noreferrer">${item.name}</a></li>`
-                    ).join('') + `</ul>`;
-                };
-
-                resHTML += buildLinks("Videos", node.resources.videos);
-                resHTML += buildLinks("Articles & Docs", node.resources.articles);
-                resHTML += buildLinks("Practice", node.resources.practice);
-                resHTML += buildLinks("Books", node.resources.books);
-                
-                resDiv.innerHTML = resHTML;
-                nodeDiv.appendChild(resDiv);
-            }
 
             // Children container
             if (hasChildren) {
@@ -122,17 +98,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function toggleExpand(path, btnElement) {
         const childrenDiv = document.getElementById(`children-${path}`);
-        const resDiv = document.getElementById(`res-${path}`);
         
         const isExpanded = childrenDiv && childrenDiv.classList.contains('expanded');
         
         if (isExpanded) {
             if(childrenDiv) childrenDiv.classList.remove('expanded');
-            if(resDiv) resDiv.classList.remove('expanded');
             btnElement.innerHTML = '▶';
         } else {
             if(childrenDiv) childrenDiv.classList.add('expanded');
-            if(resDiv) resDiv.classList.add('expanded');
             btnElement.innerHTML = '▼';
         }
     }
@@ -194,9 +167,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function bubbleUp(path) {
         const segments = path.split('-');
-        segments.pop(); // remove last node to get parent path
+        segments.pop(); 
         
-        if (segments.length < 2) return; // reached root
+        if (segments.length < 2) return; 
         
         const parentPath = segments.join('-');
         const parentContainer = document.getElementById(`children-${parentPath}`);
@@ -209,7 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (parentCheckbox && parentCheckbox.checked !== allChecked) {
                 parentCheckbox.checked = allChecked;
                 updateNodeState(parentPath, allChecked);
-                bubbleUp(parentPath); // Continue bubbling
+                bubbleUp(parentPath); 
             }
         }
     }
@@ -242,7 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Global Controls --- //
 
     function setAllExpanded(expand) {
-        const containers = document.querySelectorAll('.children-container, .resources');
+        const containers = document.querySelectorAll('.children-container');
         const btns = document.querySelectorAll('.toggle-btn');
         
         containers.forEach(c => {
@@ -308,7 +281,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Progress Calculation --- //
 
     function updateProgressUI() {
-        // Calculate root level categories
         const rootNodes = roadmapData;
         let totalLeafNodes = 0;
         let completedLeafNodes = 0;
@@ -323,21 +295,18 @@ document.addEventListener('DOMContentLoaded', () => {
             totalLeafNodes += stats.total;
             completedLeafNodes += stats.completed;
 
-            // Build individual category progress text
             const catPercent = stats.total === 0 ? 0 : Math.round((stats.completed / stats.total) * 100);
             
             const catDiv = document.createElement('div');
-            catDiv.innerHTML = `<strong>${rootNode.title}:</strong> ${catPercent}% (${stats.completed}/${stats.total})`;
+            catDiv.innerHTML = `<strong>${rootNode.title}</strong><br>${catPercent}% (${stats.completed}/${stats.total})`;
             catProgressContainer.appendChild(catDiv);
         });
 
-        // Update overall
         const overallPercent = totalLeafNodes === 0 ? 0 : Math.round((completedLeafNodes / totalLeafNodes) * 100);
-        document.getElementById('overall-percentage').textContent = `${overallPercent}% (${completedLeafNodes} / ${totalLeafNodes} completed)`;
+        document.getElementById('overall-percentage').textContent = `${overallPercent}% (${completedLeafNodes} / ${totalLeafNodes})`;
         document.getElementById('overall-bar').style.width = `${overallPercent}%`;
     }
 
-    // Helper to count leaf nodes only (actionable items) for a given parent path
     function calculateNodeStats(path) {
         const nodeElement = document.querySelector(`.node[data-path="${path}"]`);
         if (!nodeElement) return { total: 0, completed: 0 };
