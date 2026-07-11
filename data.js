@@ -1,14 +1,3 @@
-const defaultResources = {
-    videos: [
-        { name: "MIT OpenCourseWare", url: "https://ocw.mit.edu/" },
-        { name: "3Blue1Brown", url: "https://www.youtube.com/c/3blue1brown" }
-    ],
-    practice: [
-        { name: "LeetCode", url: "https://leetcode.com/" },
-        { name: "HackerRank", url: "https://www.hackerrank.com/" }
-    ]
-};
-
 const roadmapData = [
     {
         title: "Computer Science Core",
@@ -221,30 +210,3 @@ const roadmapData = [
         ]
     }
 ];
-
-// Automatically inject placeholder/default resources to EVERY node to satisfy requirements,
-// unless custom ones are specified.
-function injectResources(nodes) {
-    nodes.forEach(node => {
-        if (!node.resources) {
-            node.resources = JSON.parse(JSON.stringify(defaultResources));
-            // Add specific search queries based on title
-            node.resources.videos.push({
-                name: `Search YouTube for ${node.title}`,
-                url: `https://www.youtube.com/results?search_query=${encodeURIComponent(node.title)}`
-            });
-            node.resources.articles = [
-                { name: `Medium Articles on ${node.title}`, url: `https://medium.com/search?q=${encodeURIComponent(node.title)}` },
-                { name: `GeeksForGeeks: ${node.title}`, url: `https://www.geeksforgeeks.org/search/?q=${encodeURIComponent(node.title)}` }
-            ];
-            node.resources.books = [
-                { name: `Amazon search for ${node.title}`, url: `https://www.amazon.com/s?k=${encodeURIComponent(node.title + " computer science")}` }
-            ];
-        }
-        if (node.children) {
-            injectResources(node.children);
-        }
-    });
-}
-
-injectResources(roadmapData);
