@@ -1,194 +1,370 @@
-// app.js
-// V7: Fatigue Control, Confidence Scoring, Weak Area Analytics, Dual Pipeline
+document.addEventListener('DOMContentLoaded', () => {
+    const LOCAL_STORAGE_KEY = 'ai_roadmap_progress';
+    let progressState = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || {};
+    
+    const treeContainer = document.getElementById('roadmap-tree');
+    const searchInput = document.getElementById('search-input');
+    
+    // --- Initialization & Rendering --- //
 
-const container = document.getElementById('days-container');
-const MAX_DAILY_EFFORT = 6; // Set to 6 hours max deep work per day
+    function init() {
+        renderTree(roadmapData, treeContainer, 'root');
+        updateProgressUI();
+        attachEventListeners();
+    }
 
-let appState = JSON.parse(localStorage.getItem('v7State')) || { 
-    startDate: null, progress: {}, lastLogin: null 
-};
+    // Recursively render the tree DOM
+    function renderTree(nodes, parentElement, parentPath) {
+        nodes.forEach((node, index) => {
+            const currentPath = `${parentPath}-${index}`;
+            const isCompleted = progressState[currentPath] || false;
+            const hasChildren = node.children && node.children.length > 0;
 
-// Global state for which tab is currently active
-let activeTab = 'main'; 
+            // Create node wrapper
+            const nodeDiv = document.createElement('div');
+            nodeDiv.className = 'node';
+            nodeDiv.dataset.path = currentPath;
+            nodeDiv.dataset.title = node.title.toLowerCase();
+            if (node.description) nodeDiv.dataset.desc = node.description.toLowerCase();
 
-function getTodayString() { 
-    const d = new Date(); 
-    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; 
-}
+            // Create content row
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'node-content';
 
-function daysBetween(date1, date2) { return Math.floor((new Date(date2) - new Date(date1)) / (1000 * 60 * 60 * 24)); }
+            // Expand/Collapse Button
+            const toggleBtn = document.createElement('button');
+            toggleBtn.className = 'toggle-btn';
+            if (hasChildren) {
+                toggleBtn.innerHTML = '▶';
+                toggleBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    toggleExpand(currentPath, toggleBtn);
+                };
+            } else {
+                toggleBtn.innerHTML = '•';
+                toggleBtn.style.cursor = 'default';
+            }
+            contentDiv.appendChild(toggleBtn);
 
-// Calculate effort expended *today* across ALL pipelines
-function getTodayEffort() {
-    let todayEffort = 0;
-    const today = getTodayString();
-    for (const key in appState.progress) {
-        if (appState.progress[key].completedAt === today) {
-            todayEffort += appState.progress[key].effort || 1;
+            // Checkbox
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'checkbox';
+            checkbox.checked = isCompleted;
+            checkbox.dataset.path = currentPath;
+            contentDiv.appendChild(checkbox);
+
+            // Text content
+            const textDiv = document.createElement('div');
+            textDiv.className = 'node-text';
+            
+            const titleSpan = document.createElement('div');
+            titleSpan.className = `node-title ${isCompleted ? 'completed' : ''}`;
+            titleSpan.textContent = node.title;
+            textDiv.appendChild(titleSpan);
+
+            if (node.description) {
+                const descSpan = document.createElement('div');
+                descSpan.className = 'node-desc';
+                descSpan.textContent = node.description;
+                textDiv.appendChild(descSpan);
+            }
+
+            // Project metadata if exists
+            if (node.difficulty || node.tech || node.time) {
+                const metaSpan = document.createElement('div');
+                metaSpan.className = 'node-meta';
+                metaSpan.textContent = `[${node.difficulty}] Stack: ${node.tech} | Est: ${node.time}`;
+                textDiv.appendChild(metaSpan);
+            }
+
+            contentDiv.appendChild(textDiv);
+            nodeDiv.appendChild(contentDiv);
+
+            // Resources Section
+            if (node.resources) {
+                const resDiv = document.createElement('div');
+                resDiv.className = 'resources';
+                resDiv.id = `res-${currentPath}`;
+                
+                let resHTML = `<h4>Learning Resources</h4>`;
+                
+                const buildLinks = (title, items) => {
+                    if (!items || items.length === 0) return '';
+                    return `<strong>${title}:</strong> <ul>` + items.map(item => 
+                        `<li><a href="${item.url}" target="_blank" rel="noopener noreferrer">${item.name}</a></li>`
+                    ).join('') + `</ul>`;
+                };
+
+                resHTML += buildLinks("Videos", node.resources.videos);
+                resHTML += buildLinks("Articles & Docs", node.resources.articles);
+                resHTML += buildLinks("Practice", node.resources.practice);
+                resHTML += buildLinks("Books", node.resources.books);
+                
+                resDiv.innerHTML = resHTML;
+                nodeDiv.appendChild(resDiv);
+            }
+
+            // Children container
+            if (hasChildren) {
+                const childrenDiv = document.createElement('div');
+                childrenDiv.className = 'children-container';
+                childrenDiv.id = `children-${currentPath}`;
+                renderTree(node.children, childrenDiv, currentPath);
+                nodeDiv.appendChild(childrenDiv);
+            }
+
+            parentElement.appendChild(nodeDiv);
+        });
+    }
+
+    // --- Interaction Logic --- //
+
+    function toggleExpand(path, btnElement) {
+        const childrenDiv = document.getElementById(`children-${path}`);
+        const resDiv = document.getElementById(`res-${path}`);
+        
+        const isExpanded = childrenDiv && childrenDiv.classList.contains('expanded');
+        
+        if (isExpanded) {
+            if(childrenDiv) childrenDiv.classList.remove('expanded');
+            if(resDiv) resDiv.classList.remove('expanded');
+            btnElement.innerHTML = '▶';
+        } else {
+            if(childrenDiv) childrenDiv.classList.add('expanded');
+            if(resDiv) resDiv.classList.add('expanded');
+            btnElement.innerHTML = '▼';
         }
     }
-    return todayEffort;
-}
 
-function switchTab(tabName) {
-    activeTab = tabName;
-    document.getElementById('btn-main').classList.toggle('active', tabName === 'main');
-    document.getElementById('btn-foundations').classList.toggle('active', tabName === 'foundations');
-    renderApp();
-}
+    function attachEventListeners() {
+        treeContainer.addEventListener('change', (e) => {
+            if (e.target.classList.contains('checkbox')) {
+                const path = e.target.dataset.path;
+                const isChecked = e.target.checked;
+                handleCheck(path, isChecked);
+            }
+        });
 
-function init() {
-    const today = getTodayString();
-    if (!appState.startDate) appState.startDate = today;
-    appState.lastLogin = today; saveState();
-    
-    function updateClock() {
-        document.getElementById('date-display').innerText = `System Time: ${new Date().toLocaleTimeString()} | ${today}`;
-    }
-    setInterval(updateClock, 1000); 
-    updateClock();
-
-    renderApp();
-}
-
-function saveState() { localStorage.setItem('v7State', JSON.stringify(appState)); }
-
-function renderApp() {
-    const todayStr = getTodayString();
-    const calendarDay = daysBetween(appState.startDate, todayStr) + 1;
-    const todayEffort = getTodayEffort(); // Global fatigue
-    
-    container.innerHTML = '';
-    let totalConfidence = 0; let confidenceCount = 0; let weakAreas = [];
-
-    // Determine which array to render based on the active tab
-    const currentDataPath = activeTab === 'main' ? learningPath : foundationalPath;
-    const idPrefix = activeTab === 'main' ? 'main' : 'found'; // Crucial to prevent ID collision in localStorage
-
-    currentDataPath.forEach((dayData) => {
-        const card = document.createElement('div'); card.className = 'day-card';
+        document.getElementById('btn-expand-all').onclick = () => setAllExpanded(true);
+        document.getElementById('btn-collapse-all').onclick = () => setAllExpanded(false);
+        document.getElementById('btn-check-all').onclick = () => setAllChecked(true);
+        document.getElementById('btn-uncheck-all').onclick = () => setAllChecked(false);
         
-        let status = 'active'; 
-        let badgeColor = activeTab === 'main' ? 'var(--accent)' : 'var(--project)'; // Purple badge for foundations
-
-        if (dayData.day === calendarDay) { card.style.borderColor = 'var(--success)'; card.style.boxShadow = '0 0 15px rgba(16, 185, 129, 0.1)'; }
-
-        const header = document.createElement('div'); header.className = 'day-header';
-        header.innerHTML = `<h3><span class="day-badge" style="background-color: ${badgeColor};">Day ${dayData.day}</span> ${dayData.topic}</h3>`;
-        
-        header.addEventListener('click', () => { card.classList.toggle('active'); });
-
-        const subList = document.createElement('div'); subList.className = 'subtopics-list';
-
-        dayData.subtopics.forEach((sub, i) => {
-            // Uniquely identify the task so Math Day 1 doesn't overwrite Java Day 1
-            const taskId = `${idPrefix}-day${dayData.day}-task${i}`;
-            
-            // Legacy check: If you already started V7 before this update, preserve old main tasks
-            const legacyId = `day${dayData.day}-task${i}`;
-            if (activeTab === 'main' && appState.progress[legacyId] && !appState.progress[taskId]) {
-                appState.progress[taskId] = appState.progress[legacyId];
-                delete appState.progress[legacyId];
+        document.getElementById('btn-reset').onclick = () => {
+            if(confirm("Are you sure you want to reset all progress?")) {
+                progressState = {};
                 saveState();
-            }
-
-            const taskData = appState.progress[taskId];
-            const isChecked = taskData ? 'checked' : '';
-            
-            const difficulty = sub.difficulty || 'easy';
-            const type = sub.type || 'theory';
-            let effortVal = difficulty === 'hard' ? 3 : difficulty === 'medium' ? 2 : 1;
-            
-            let diffClass = difficulty === 'hard' ? 'diff-hard' : difficulty === 'medium' ? 'diff-med' : 'diff-easy';
-            let typeTag = type === 'project' ? `<span class="diff-tag type-project">⚙️ PROJECT</span>` : '';
-            let linkHTML = sub.url ? `<a href="${sub.url}" target="_blank" class="inline-link">📖 Study / Watch</a>` : '';
-
-            const item = document.createElement('div'); item.className = 'subtopic-item';
-            
-            item.innerHTML = `
-                <div class="task-main-row">
-                    <input type="checkbox" id="${taskId}" ${isChecked}>
-                    <label for="${taskId}" class="task-label ${isChecked ? 'completed-text' : ''}">
-                        ${sub.title} 
-                        <span class="diff-tag ${diffClass}">${difficulty} (${effortVal}h)</span>
-                        ${typeTag}
-                    </label>
-                    ${linkHTML}
-                </div>
-                <div class="confidence-panel ${isChecked ? 'visible' : ''}" id="conf-${taskId}">
-                    <span style="font-size: 0.85rem; color: var(--text-muted);">Confidence Score:</span>
-                    ${[1,2,3,4,5].map(num => `<button class="conf-btn ${taskData && taskData.confidence === num ? 'selected' : ''}" data-val="${num}">${num}</button>`).join('')}
-                </div>
-            `;
-
-            if (taskData && taskData.confidence > 0) {
-                totalConfidence += taskData.confidence;
-                confidenceCount++;
-                if (taskData.confidence <= 2) weakAreas.push(sub.title);
-            }
-
-            item.querySelector('input').addEventListener('change', (e) => {
-                if (e.target.checked) {
-                    appState.progress[taskId] = { completedAt: getTodayString(), effort: effortVal, confidence: 0 };
-                } else {
-                    delete appState.progress[taskId];
-                }
-                saveState(); renderApp(); 
-            });
-
-            const confBtns = item.querySelectorAll('.conf-btn');
-            confBtns.forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const val = parseInt(e.target.getAttribute('data-val'));
-                    appState.progress[taskId].confidence = val;
-                    saveState(); renderApp();
+                document.querySelectorAll('.checkbox').forEach(cb => {
+                    cb.checked = false;
+                    updateTitleStyle(cb.dataset.path, false);
                 });
-            });
+                updateProgressUI();
+            }
+        };
 
-            subList.appendChild(item);
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+            handleSearch(query);
+        });
+    }
+
+    // --- State & Checkbox Cascade Logic --- //
+
+    function handleCheck(path, isChecked) {
+        // 1. Update self
+        updateNodeState(path, isChecked);
+
+        // 2. Cascade down to children
+        const childrenContainer = document.getElementById(`children-${path}`);
+        if (childrenContainer) {
+            const childCheckboxes = childrenContainer.querySelectorAll('.checkbox');
+            childCheckboxes.forEach(cb => {
+                cb.checked = isChecked;
+                updateNodeState(cb.dataset.path, isChecked);
+            });
+        }
+
+        // 3. Bubble up to ancestors
+        bubbleUp(path);
+
+        saveState();
+        updateProgressUI();
+    }
+
+    function bubbleUp(path) {
+        const segments = path.split('-');
+        segments.pop(); // remove last node to get parent path
+        
+        if (segments.length < 2) return; // reached root
+        
+        const parentPath = segments.join('-');
+        const parentContainer = document.getElementById(`children-${parentPath}`);
+        
+        if (parentContainer) {
+            const siblingCheckboxes = Array.from(parentContainer.querySelectorAll(`:scope > .node > .node-content > .checkbox`));
+            const allChecked = siblingCheckboxes.length > 0 && siblingCheckboxes.every(cb => cb.checked);
+            
+            const parentCheckbox = document.querySelector(`.checkbox[data-path="${parentPath}"]`);
+            if (parentCheckbox && parentCheckbox.checked !== allChecked) {
+                parentCheckbox.checked = allChecked;
+                updateNodeState(parentPath, allChecked);
+                bubbleUp(parentPath); // Continue bubbling
+            }
+        }
+    }
+
+    function updateNodeState(path, isChecked) {
+        if (isChecked) {
+            progressState[path] = true;
+        } else {
+            delete progressState[path];
+        }
+        updateTitleStyle(path, isChecked);
+    }
+
+    function updateTitleStyle(path, isChecked) {
+        const nodeDiv = document.querySelector(`.node[data-path="${path}"]`);
+        if (nodeDiv) {
+            const title = nodeDiv.querySelector('.node-title');
+            if (isChecked) {
+                title.classList.add('completed');
+            } else {
+                title.classList.remove('completed');
+            }
+        }
+    }
+
+    function saveState() {
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(progressState));
+    }
+
+    // --- Global Controls --- //
+
+    function setAllExpanded(expand) {
+        const containers = document.querySelectorAll('.children-container, .resources');
+        const btns = document.querySelectorAll('.toggle-btn');
+        
+        containers.forEach(c => {
+            if (expand) c.classList.add('expanded');
+            else c.classList.remove('expanded');
         });
         
-        card.appendChild(header); card.appendChild(subList); container.appendChild(card);
-    });
-
-    updateAnalytics(todayEffort, totalConfidence, confidenceCount, weakAreas);
-}
-
-function updateAnalytics(effort, totalConf, confCount, weakAreas) {
-    const fatigueBar = document.getElementById('fatigue-bar');
-    const effortText = document.getElementById('effort-display');
-    const warningText = document.getElementById('fatigue-warning');
-    
-    let effortPercent = (effort / MAX_DAILY_EFFORT) * 100;
-    if (effortPercent > 100) effortPercent = 100;
-    
-    fatigueBar.style.width = `${effortPercent}%`;
-    effortText.innerText = `${effort} / ${MAX_DAILY_EFFORT} Hrs`;
-    
-    fatigueBar.className = 'fatigue-bar-fill';
-    if (effort >= MAX_DAILY_EFFORT) {
-        fatigueBar.classList.add('fatigue-danger');
-        warningText.innerText = "🛑 BURNOUT LIMIT REACHED. Stop coding. Rest your brain.";
-        warningText.style.color = "var(--danger)";
-    } else if (effort >= MAX_DAILY_EFFORT - 2) {
-        fatigueBar.classList.add('fatigue-warn');
-        warningText.innerText = "⚠️ High cognitive load. Proceed with caution.";
-        warningText.style.color = "var(--warning)";
-    } else {
-        fatigueBar.classList.add('fatigue-safe');
-        warningText.innerText = "Deep work capacity healthy.";
-        warningText.style.color = "var(--text-muted)";
+        btns.forEach(btn => {
+            if (btn.innerHTML === '▶' || btn.innerHTML === '▼') {
+                btn.innerHTML = expand ? '▼' : '▶';
+            }
+        });
     }
 
-    const avgConf = confCount === 0 ? 0 : (totalConf / confCount).toFixed(1);
-    document.getElementById('confidence-display').innerHTML = `${avgConf} <span style="font-size: 1rem; color: var(--text-muted);">Avg Confidence</span>`;
-
-    const weakContainer = document.getElementById('weak-areas-container');
-    if (weakAreas.length === 0) {
-        weakContainer.innerHTML = `<span style="font-size: 0.9rem; color: var(--text-muted);">No weak areas detected in this track.</span>`;
-    } else {
-        weakContainer.innerHTML = weakAreas.map(w => `<span class="weak-area-tag">⚠️ ${w}</span>`).join('');
+    function setAllChecked(check) {
+        document.querySelectorAll('.checkbox').forEach(cb => {
+            cb.checked = check;
+            updateNodeState(cb.dataset.path, check);
+        });
+        saveState();
+        updateProgressUI();
     }
-}
 
-init();
+    // --- Search --- //
+
+    function handleSearch(query) {
+        const allNodes = document.querySelectorAll('.node');
+        
+        if (query === '') {
+            allNodes.forEach(node => {
+                node.classList.remove('hidden');
+            });
+            return;
+        }
+
+        allNodes.forEach(node => node.classList.add('hidden'));
+
+        allNodes.forEach(node => {
+            const title = node.dataset.title || '';
+            const desc = node.dataset.desc || '';
+            
+            if (title.includes(query) || desc.includes(query)) {
+                // Show matching node
+                node.classList.remove('hidden');
+                
+                // Show all ancestors & expand them
+                let current = node.parentElement;
+                while (current && current.id !== 'roadmap-tree') {
+                    if (current.classList.contains('node')) {
+                        current.classList.remove('hidden');
+                    }
+                    if (current.classList.contains('children-container')) {
+                        current.classList.add('expanded');
+                        const toggleBtn = current.parentElement.querySelector('.toggle-btn');
+                        if(toggleBtn && toggleBtn.innerHTML !== '•') toggleBtn.innerHTML = '▼';
+                    }
+                    current = current.parentElement;
+                }
+            }
+        });
+    }
+
+    // --- Progress Calculation --- //
+
+    function updateProgressUI() {
+        // Calculate root level categories
+        const rootNodes = roadmapData;
+        let totalLeafNodes = 0;
+        let completedLeafNodes = 0;
+        
+        const catProgressContainer = document.getElementById('category-progress-container');
+        catProgressContainer.innerHTML = '';
+
+        rootNodes.forEach((rootNode, index) => {
+            const rootPath = `root-${index}`;
+            const stats = calculateNodeStats(rootPath);
+            
+            totalLeafNodes += stats.total;
+            completedLeafNodes += stats.completed;
+
+            // Build individual category progress text
+            const catPercent = stats.total === 0 ? 0 : Math.round((stats.completed / stats.total) * 100);
+            
+            const catDiv = document.createElement('div');
+            catDiv.innerHTML = `<strong>${rootNode.title}:</strong> ${catPercent}% (${stats.completed}/${stats.total})`;
+            catProgressContainer.appendChild(catDiv);
+        });
+
+        // Update overall
+        const overallPercent = totalLeafNodes === 0 ? 0 : Math.round((completedLeafNodes / totalLeafNodes) * 100);
+        document.getElementById('overall-percentage').textContent = `${overallPercent}% (${completedLeafNodes} / ${totalLeafNodes} completed)`;
+        document.getElementById('overall-bar').style.width = `${overallPercent}%`;
+    }
+
+    // Helper to count leaf nodes only (actionable items) for a given parent path
+    function calculateNodeStats(path) {
+        const nodeElement = document.querySelector(`.node[data-path="${path}"]`);
+        if (!nodeElement) return { total: 0, completed: 0 };
+
+        const childrenContainer = document.getElementById(`children-${path}`);
+        if (!childrenContainer) {
+            // It's a leaf node
+            const checkbox = nodeElement.querySelector('.checkbox');
+            return {
+                total: 1,
+                completed: checkbox.checked ? 1 : 0
+            };
+        }
+
+        // It's a parent, sum up children stats
+        let total = 0;
+        let completed = 0;
+        const childNodes = childrenContainer.querySelectorAll(`:scope > .node`);
+        childNodes.forEach(child => {
+            const stats = calculateNodeStats(child.dataset.path);
+            total += stats.total;
+            completed += stats.completed;
+        });
+
+        return { total, completed };
+    }
+
+    // Boot
+    init();
+});
