@@ -10,20 +10,22 @@ const roadmapData = [
         ]
     },
     {
-        title: "Stage 2: Backend Systems",
-        description: "Building robust, containerized data engines.",
+        title: "Stage 2: Java Backend Systems",
+        description: "Building robust, enterprise-grade data engines and APIs using the JVM ecosystem.",
         children: [
-            { title: "Advanced Programming (Python/C++)", description: "OOP, Memory Management, Asyncio, Multithreading, GIL (Python), Smart Pointers (C++)." },
+            { title: "Advanced Core Java", description: "JVM internals (Garbage Collection, Memory Model), Streams API, Multithreading & Concurrency (java.util.concurrent), Exceptions." },
             { title: "Relational Databases (SQL)", description: "PostgreSQL, ACID properties, normalization, complex joins, B-Tree indexing, execution plans." },
-            { title: "API Development", description: "RESTful principles, HTTP/TCP fundamentals, FastAPI, request validation, stateless architectures." },
-            { title: "Containerization", description: "Docker, writing optimized Dockerfiles, Docker Compose, volume mapping, container networking." }
+            { title: "Spring Ecosystem", description: "Dependency Injection (IoC), Spring Boot auto-configuration, Spring Web (REST APIs), Spring Security (JWT/OAuth2)." },
+            { title: "Data Access", description: "Hibernate, JPA (Java Persistence API), handling N+1 query problems, connection pooling." },
+            { title: "Build & Test Tools", description: "Maven/Gradle for dependency management. JUnit 5 and Mockito for unit and integration testing." },
+            { title: "Containerization", description: "Dockerizing Java applications, multi-stage builds, minimizing JVM image sizes." }
         ]
     },
     {
         title: "Stage 3: Machine Learning Fundamentals",
-        description: "Solving problems with data, statistics, and traditional ML.",
+        description: "Solving problems with data, statistics, and traditional ML. (Shift to Python here).",
         children: [
-            { title: "Data Processing", description: "Pandas, NumPy, handling missing data, outlier detection, data leakage prevention." },
+            { title: "Data Processing (Python)", description: "Pandas, NumPy, handling missing data, outlier detection, data leakage prevention." },
             { title: "Feature Engineering", description: "One-hot encoding, scaling/normalization, dimensionality reduction (PCA)." },
             { title: "Supervised & Unsupervised Learning", description: "Linear/Logistic Regression, K-Means Clustering, SVMs." },
             { title: "Tree-Based Models", description: "Decision Trees, Random Forests, Gradient Boosting (XGBoost, LightGBM)." },
@@ -32,7 +34,7 @@ const roadmapData = [
     },
     {
         title: "Stage 4: Deep Learning & Applied AI",
-        description: "Neural architectures and generative AI implementations.",
+        description: "Neural architectures and generative AI implementations. (Python).",
         children: [
             { title: "Neural Network Core", description: "Forward propagation, Backpropagation (deriving gradients), Loss functions (Cross-Entropy, MSE), Optimizers (Adam, SGD)." },
             { title: "Deep Learning Frameworks", description: "PyTorch: Tensors, Autograd, custom nn.Module, DataLoaders, GPU memory management." },
@@ -42,32 +44,31 @@ const roadmapData = [
         ]
     },
     {
-        title: "Stage 5: Production, Scale & MLOps",
-        description: "Deploying models and scaling systems to handle enterprise traffic.",
+        title: "Stage 5: Production, Scale & Polyglot Architecture",
+        description: "Deploying models and bridging your Java backend with your Python ML services.",
         children: [
             { title: "System Design Basics", description: "Monolith vs Microservices, CAP Theorem, Horizontal vs Vertical scaling, Load Balancing." },
-            { title: "Asynchronous Architecture", description: "Message Queues (Kafka/RabbitMQ) for decoupling heavy ML inference from fast API responses." },
-            { title: "Caching Strategies", description: "Redis, in-memory datastores, cache invalidation, reducing database load." },
+            { title: "Asynchronous Architecture", description: "Message Queues (Kafka/RabbitMQ) to decouple fast Java APIs from slow Python ML inference." },
+            { title: "Caching Strategies", description: "Redis, in-memory datastores, cache invalidation, reducing Postgres load." },
             { title: "Model Serving & Optimization", description: "Exporting models to ONNX/TensorRT, serving via Triton or FastAPI, batching inference requests." },
-            { title: "MLOps & CI/CD", description: "Experiment tracking (MLflow), Data versioning (DVC), GitHub Actions for automated testing and deployment, monitoring for data drift." }
+            { title: "MLOps & CI/CD", description: "Experiment tracking (MLflow), Data versioning (DVC), GitHub Actions for testing both Java and Python codebases." }
         ]
     },
     {
         title: "Capstone Projects",
-        description: "High-impact, end-to-end systems to prove competence.",
+        description: "High-impact, end-to-end systems to prove competence across both stacks.",
         children: [
-            { title: "1. Custom Git CLI", description: "Build init, add, and commit from scratch. (Tests: DSA, OS, Python/C++)" },
-            { title: "2. Containerized Ledger API", description: "High-concurrency banking API with Postgres. (Tests: DBs, APIs, Docker, Concurrency)" },
-            { title: "3. Automated Fraud Pipeline", description: "End-to-end XGBoost model with SMOTE and MLflow. (Tests: Data Cleaning, ML, Evaluation)" },
-            { title: "4. GPU-Accelerated RAG API", description: "Document Q&A using Vector DBs and local LLMs. (Tests: PyTorch, LLMs, API serving)" },
-            { title: "5. Scalable ML Inference Server", description: "Async image processing with Kafka and Redis. (Tests: System Design, Queues, MLOps)" }
+            { title: "1. Spring Boot E-Commerce Engine", description: "Core backend with Spring Boot, Hibernate, and Postgres. (Tests: Java, APIs, DB Design, Security)" },
+            { title: "2. Automated Fraud Pipeline", description: "End-to-end XGBoost model with SMOTE and MLflow. (Tests: Python, Data Cleaning, ML, Evaluation)" },
+            { title: "3. GPU-Accelerated RAG API", description: "Document Q&A using Vector DBs and local LLMs. (Tests: Python, PyTorch, LLMs, AI serving)" },
+            { title: "4. Polyglot ML Inference System", description: "A Spring Boot frontend API drops image processing tasks into Kafka. A separate Python GPU worker picks up tasks, runs inference, and returns results via Redis. (Tests: System Design, Polyglot Architecture, Kafka)" }
         ]
     },
     {
         title: "Interview Preparation",
         description: "Targeted practice for technical screens.",
         children: [
-            { title: "Data Structures & Algorithms", description: "NeetCode 150, focusing on pattern recognition (Sliding window, Two-pointer, BFS/DFS)." },
+            { title: "Data Structures & Algorithms", description: "NeetCode 150 (Implement in Java). Focus on pattern recognition (Sliding window, Two-pointer, BFS/DFS). Note: Java Collections (Map, Set, PriorityQueue) are mandatory here." },
             { title: "ML Fundamentals Prep", description: "Whiteboard derivations of Logistic Regression, understanding L1/L2 regularization math." },
             { title: "System Design Prep", description: "Drawing architectures, capacity estimation, defending infrastructure choices." }
         ]
